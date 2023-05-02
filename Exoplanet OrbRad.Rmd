@@ -1,0 +1,50 @@
+---
+title: "Exoplanet Radius"
+author: "Mark Bowen"
+date: '2023-04-30'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(moderndive)
+```
+
+## R Markdown
+
+
+```{r message=FALSE, warning=FALSE}
+exoPlanet_df <- read_csv("exoPlanet_df.csv")
+exoPlanet_df <- exoPlanet_df %>% filter(orbital_radius > 0) %>% select(name, planet_type, orbital_radius)
+exoPlanet_df <- exoPlanet_df %>% filter(planet_type != 'Neptune-like') %>% filter(planet_type != 'Super Earth')
+gasGiant_exo <- exoPlanet_df %>% filter(planet_type == 'Gas Giant')
+terrestrial_exo <- exoPlanet_df %>% filter(planet_type == 'Terrestrial')
+gasGiant_s1001 <- gasGiant_exo %>% sample_n(size = 1001)
+
+summaryOrbRad <- exoPlanet_df %>% group_by(planet_type) %>% summarise(med = median(orbital_radius), mean = mean(orbital_radius), stdDev = sd(orbital_radius))
+
+exoPlanet_s10 <- exoPlanet_df %>% sample_n(size = 10)
+
+exoPlanet_s10
+summaryOrbRad
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=TRUE, message=FALSE, warning=FALSE}
+ggplot(data = gasGiant_exo, mapping = aes(x = orbital_radius)) +geom_histogram(binwidth = 0.01, color = 'white') + labs(x = "Orbital Radius", title = "Orbital Radius of Gas Giants") + xlim(c(0,1))
+
+ggplot(data = gasGiant_s1001, mapping = aes(x = orbital_radius)) +geom_histogram(binwidth = 0.01, color = 'white') + labs(x = "Orbital Radius", title = "Orbital Radius of Gas Giants Sample") + xlim(c(0,1))
+
+ggplot(data = terrestrial_exo, mapping = aes(x = orbital_radius)) + geom_histogram(binwidth = 0.01, color = 'white') + labs(x = "Orbital Radius", title = "Orbital Radius of Terrestrial Planets") + xlim(c(0,1))
+
+glimpse(gasGiant_s1001)
+
+gasGiant_s1001 %>% summarize(mean = mean(orbital_radius))
+gasGiant_s1001 %>% summarize(sd = sd(orbital_radius))
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
